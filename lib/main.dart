@@ -11,15 +11,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'IT Service Pricing Cards',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       home: const PricingPage(),
     );
   }
 }
 
+// ==========================================
+// SCREEN 1 (Beranda) - StatelessWidget
+// ==========================================
 class PricingPage extends StatelessWidget {
   const PricingPage({Key? key}) : super(key: key);
 
@@ -28,7 +28,7 @@ class PricingPage extends StatelessWidget {
     final List<PricingData> pricingPlans = [
       PricingData(
         badgeText: '',
-        icon: Icons.storage, // Icon untuk Basic (storage)
+        icon: Icons.storage,
         serviceName: 'Basic',
         description: 'Untuk pemula',
         price: 'Rp 500.000',
@@ -44,7 +44,7 @@ class PricingPage extends StatelessWidget {
       ),
       PricingData(
         badgeText: 'Rekomendasi',
-        icon: Icons.laptop, // Icon untuk Professional (laptop)
+        icon: Icons.laptop,
         serviceName: 'Professional',
         description: 'Paling populer',
         price: 'Rp 5.000.000',
@@ -62,7 +62,7 @@ class PricingPage extends StatelessWidget {
       ),
       PricingData(
         badgeText: '',
-        icon: Icons.cloud, // Icon untuk Enterprise (cloud)
+        icon: Icons.cloud,
         serviceName: 'Enterprise',
         description: 'Untuk korporasi',
         price: 'Custom',
@@ -93,45 +93,44 @@ class PricingPage extends StatelessWidget {
               const SizedBox(height: 16),
               const Text(
                 'Pilih Paket Layanan Terbaik',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
                 'Solusi cloud terlengkap dengan harga terjangkau',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
-              // Responsive grid layout
               Wrap(
                 spacing: 20,
                 runSpacing: 20,
                 alignment: WrapAlignment.center,
                 children: pricingPlans
-                    .map((plan) => PricingCard(
-                          badgeText: plan.badgeText,
-                          icon: plan.icon,
-                          serviceName: plan.serviceName,
-                          description: plan.description,
-                          price: plan.price,
-                          duration: plan.duration,
-                          features: plan.features,
-                          backgroundColor: plan.backgroundColor ?? Colors.white,
-                          isFeatured: plan.isFeatured,
-                          onPressedButton: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content:
-                                    Text('Paket ${plan.serviceName} dipilih!'),
-                              ),
-                            );
-                          },
-                        ))
+                    .map(
+                      (plan) => PricingCard(
+                        badgeText: plan.badgeText,
+                        icon: plan.icon,
+                        serviceName: plan.serviceName,
+                        description: plan.description,
+                        price: plan.price,
+                        duration: plan.duration,
+                        features: plan.features,
+                        backgroundColor: plan.backgroundColor ?? Colors.white,
+                        isFeatured: plan.isFeatured,
+                        onPressedButton: () {
+                          // REQ b: Navigasi Stack menggunakan Navigator.push
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  PricingDetailScreen(plan: plan),
+                            ),
+                          );
+                        },
+                      ),
+                    )
                     .toList(),
               ),
             ],
@@ -142,6 +141,131 @@ class PricingPage extends StatelessWidget {
   }
 }
 
+// ==========================================
+// SCREEN 2 (Detail Katalog) - StatefulWidget
+// ==========================================
+class PricingDetailScreen extends StatefulWidget {
+  final PricingData plan;
+
+  const PricingDetailScreen({Key? key, required this.plan}) : super(key: key);
+
+  @override
+  State<PricingDetailScreen> createState() => _PricingDetailScreenState();
+}
+
+class _PricingDetailScreenState extends State<PricingDetailScreen> {
+  // REQ Utama c: State interaktif pada tombol
+  bool isFavorite = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Detail: ${widget.plan.serviceName}'),
+        // REQ e: Fungsi "Kembali" bawaan otomatis tersedia dari AppBar
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        // REQ c: Tata letak vertikal dengan Column
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // REQ d: Icon back manual untuk kembali ke Screen 1
+            InkWell(
+              onTap: () => Navigator.pop(context),
+              child: const Row(
+                children: [
+                  Icon(Icons.arrow_back_ios, size: 16),
+                  Text(' Kembali ke Daftar Paket'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // REQ d: Text menampilkan nama dan harga
+            Row(
+              children: [
+                Icon(widget.plan.icon, size: 40, color: Colors.blue),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.plan.serviceName,
+                      style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      '${widget.plan.price} / ${widget.plan.duration}',
+                      style: const TextStyle(fontSize: 18, color: Colors.blue),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // REQ d: Container dengan latar warna pastel dan padding
+            Container(
+              padding: const EdgeInsets.all(20.0),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFDFD96), // Warna pastel kuning
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Deskripsi Layanan:',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Paket ${widget.plan.serviceName} sangat direkomendasikan ${widget.plan.description.toLowerCase()}. Paket ini mencakup berbagai fitur utama yang dirancang untuk mendukung performa sistem Anda secara optimal.',
+                    style: const TextStyle(fontSize: 15, height: 1.5),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            // REQ Utama c: Tombol state interaktif
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  setState(() {
+                    isFavorite = !isFavorite;
+                  });
+                },
+                icon: Icon(isFavorite ? Icons.bookmark : Icons.bookmark_border),
+                label: Text(isFavorite ? 'Terpilih Paket' : 'Pilih Paket'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isFavorite
+                      ? Colors.green[100]
+                      : Colors.grey[200],
+                  foregroundColor: isFavorite
+                      ? Colors.green[800]
+                      : Colors.black87,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ==========================================
+// MODEL & WIDGET KOMPONEN
+// ==========================================
 class PricingData {
   final String badgeText;
   final IconData icon;
@@ -226,21 +350,15 @@ class _PricingCardState extends State<PricingCard> {
           ),
           child: Stack(
             children: [
-              // Main Content
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header dengan Icon dan Service Name
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          widget.icon,
-                          size: 48,
-                          color: Colors.blue,
-                        ),
+                        Icon(widget.icon, size: 48, color: Colors.blue),
                         const SizedBox(height: 12),
                         Text(
                           widget.serviceName,
@@ -260,8 +378,6 @@ class _PricingCardState extends State<PricingCard> {
                       ],
                     ),
                     const SizedBox(height: 20),
-
-                    // Harga dan Durasi (Row)
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.baseline,
                       textBaseline: TextBaseline.alphabetic,
@@ -285,37 +401,35 @@ class _PricingCardState extends State<PricingCard> {
                       ],
                     ),
                     const SizedBox(height: 20),
-
-                    // Daftar Fitur (Column & Row combination)
                     Column(
                       children: widget.features
-                          .map((feature) => Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8),
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.check_circle,
-                                      size: 20,
-                                      color: Colors.green,
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Text(
-                                        feature,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black87,
-                                        ),
+                          .map(
+                            (feature) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.check_circle,
+                                    size: 20,
+                                    color: Colors.green,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      feature,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.black87,
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ))
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
                           .toList(),
                     ),
                     const SizedBox(height: 24),
-
-                    // Call-to-Action Button
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -340,15 +454,15 @@ class _PricingCardState extends State<PricingCard> {
                   ],
                 ),
               ),
-
-              // Badge Recommended (Positioned di sudut kanan atas)
               if (widget.badgeText.isNotEmpty)
                 Positioned(
                   top: 12,
                   right: 12,
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.red,
                       borderRadius: BorderRadius.circular(20),
