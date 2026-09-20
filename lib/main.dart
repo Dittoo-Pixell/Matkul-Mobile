@@ -17,9 +17,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// ==========================================
-// SCREEN 1 (Beranda) - StatelessWidget
-// ==========================================
 class PricingPage extends StatelessWidget {
   const PricingPage({Key? key}) : super(key: key);
 
@@ -85,65 +82,59 @@ class PricingPage extends StatelessWidget {
         centerTitle: true,
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 16),
-              const Text(
-                'Pilih Paket Layanan Terbaik',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Solusi cloud terlengkap dengan harga terjangkau',
-                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 32),
-              Wrap(
-                spacing: 20,
-                runSpacing: 20,
-                alignment: WrapAlignment.center,
-                children: pricingPlans
-                    .map(
-                      (plan) => PricingCard(
-                        badgeText: plan.badgeText,
-                        icon: plan.icon,
-                        serviceName: plan.serviceName,
-                        description: plan.description,
-                        price: plan.price,
-                        duration: plan.duration,
-                        features: plan.features,
-                        backgroundColor: plan.backgroundColor ?? Colors.white,
-                        isFeatured: plan.isFeatured,
-                        onPressedButton: () {
-                          // REQ b: Navigasi Stack menggunakan Navigator.push
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  PricingDetailScreen(plan: plan),
-                            ),
-                          );
-                        },
-                      ),
-                    )
-                    .toList(),
-              ),
-            ],
-          ),
-        ),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(16.0),
+        itemCount: pricingPlans.length + 1,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return const Column(
+              children: [
+                SizedBox(height: 16),
+                Text(
+                  'Pilih Paket Layanan Terbaik',
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Solusi cloud terlengkap dengan harga terjangkau',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 32),
+              ],
+            );
+          }
+
+          final plan = pricingPlans[index - 1];
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 20.0),
+            child: PricingCard(
+              badgeText: plan.badgeText,
+              icon: plan.icon,
+              serviceName: plan.serviceName,
+              description: plan.description,
+              price: plan.price,
+              duration: plan.duration,
+              features: plan.features,
+              backgroundColor: plan.backgroundColor ?? Colors.white,
+              isFeatured: plan.isFeatured,
+              onPressedButton: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PricingDetailScreen(plan: plan),
+                  ),
+                );
+              },
+            ),
+          );
+        },
       ),
     );
   }
 }
 
-// ==========================================
-// SCREEN 2 (Detail Katalog) - StatefulWidget
-// ==========================================
 class PricingDetailScreen extends StatefulWidget {
   final PricingData plan;
 
@@ -154,23 +145,17 @@ class PricingDetailScreen extends StatefulWidget {
 }
 
 class _PricingDetailScreenState extends State<PricingDetailScreen> {
-  // REQ Utama c: State interaktif pada tombol
   bool isFavorite = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Detail: ${widget.plan.serviceName}'),
-        // REQ e: Fungsi "Kembali" bawaan otomatis tersedia dari AppBar
-      ),
+      appBar: AppBar(title: Text('Detail: ${widget.plan.serviceName}')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        // REQ c: Tata letak vertikal dengan Column
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // REQ d: Icon back manual untuk kembali ke Screen 1
             InkWell(
               onTap: () => Navigator.pop(context),
               child: const Row(
@@ -181,8 +166,6 @@ class _PricingDetailScreenState extends State<PricingDetailScreen> {
               ),
             ),
             const SizedBox(height: 24),
-
-            // REQ d: Text menampilkan nama dan harga
             Row(
               children: [
                 Icon(widget.plan.icon, size: 40, color: Colors.blue),
@@ -206,13 +189,11 @@ class _PricingDetailScreenState extends State<PricingDetailScreen> {
               ],
             ),
             const SizedBox(height: 24),
-
-            // REQ d: Container dengan latar warna pastel dan padding
             Container(
               padding: const EdgeInsets.all(20.0),
               width: double.infinity,
               decoration: BoxDecoration(
-                color: const Color(0xFFFDFD96), // Warna pastel kuning
+                color: const Color(0xFFFDFD96),
                 borderRadius: BorderRadius.circular(12.0),
               ),
               child: Column(
@@ -231,8 +212,6 @@ class _PricingDetailScreenState extends State<PricingDetailScreen> {
               ),
             ),
             const SizedBox(height: 32),
-
-            // REQ Utama c: Tombol state interaktif
             Center(
               child: ElevatedButton.icon(
                 onPressed: () {
@@ -263,9 +242,6 @@ class _PricingDetailScreenState extends State<PricingDetailScreen> {
   }
 }
 
-// ==========================================
-// MODEL & WIDGET KOMPONEN
-// ==========================================
 class PricingData {
   final String badgeText;
   final IconData icon;
